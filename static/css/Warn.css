@@ -1,0 +1,18 @@
+
+#Warn {
+  text-align: center;
+  color: red;
+}
+
+.body-image {
+    left: 0;
+    top: 0;
+    width: 800px;
+    height: 600px;
+  user-drag: none;
+  -webkit-user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}

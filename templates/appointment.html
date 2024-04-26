@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-table.css">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/Warn.css')}}">
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script> 
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+  <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+  
+  <title>MedEase</title>
+</head>
+
+<body>
+ 
+  <nav class="navbar navbar-inverse justify-content-center">
+    <div class="navbar-header">
+        <a class="navbar-brand " href="#">MedEase</a>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="/login"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+  	{% block content %}
+    <div class="container">
+        {% for message in get_flashed_messages(with_categories=True) %}
+        <div class="alert alert-{{ message[0] }}">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message[1]}}
+        </div>
+        {% endfor %}
+    </div>
+{% endblock content %}
+    
+    <div class="tab-content">
+        <div>
+            <div class="row">
+                <div class="col-xs-8">
+                    <table id="transTable" class="table" style=" margin-top: 15px;">
+                    <thead>
+                        <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Doctor</th>
+                        <th scope="col">Medical Department</th>
+                        <th scope="col">Appointment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for schedule in scheduleList %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ schedule.0 }}</td>
+                            <td>{{ schedule.1 }}</td>
+                            <td>{{ schedule.2 }}</td>
+                            <td>
+                                <form action="/makeAppointment" method="POST">
+                                <input type="hidden" id="form-id" name="id" >
+                                <button type="submit" name="schid" value="{{ schedule.3 }}" onclick="setFormId(this)" class="btn btn-info">Appointment</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+  <script>
+    $(document).ready(function () {
+      $(".nav-tabs a").click(function () {
+        $(this).tab('show');
+      });
+    });
+  </script>
+  <script type=text/javascript>
+	$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+  </script>
+</body>
+</html>

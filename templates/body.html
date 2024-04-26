@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="../static/images/favicon.png" type="image/png">
+        <title>MedEase</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../static/css/bootstrap.css">
+        <link rel="stylesheet" href="../static/vendors/linericon/style.css">
+        <link rel="stylesheet" href="../static/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../static/css/style2.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script> 
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+
+        <!-- Bootstrap CSS -->
+        
+    </head>
+    <body>
+        <!--================Header Area =================-->
+        <header class="header_area">
+            <div class="container">
+                <nav class="navbar navbar-expand-lg navbar-light">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <h1><a class="navbar-brand" href="/main">MedEase</a></h1>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
+                        <ul class="nav navbar-nav menu_nav ml-auto">
+                            <li class="nav-item active"><a class="nav-link" href="/main">首頁</a></li> 
+                            <li class="nav-item submenu dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">個人檔案</a>
+                                <ul class="dropdown-menu">
+                                    <li class="nav-item"><a class="nav-link" href="/profile">基本資料</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/Econtact">緊急聯絡人</a></li>
+                                </ul>
+                            </li> 
+                            <li class="nav-item submenu dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">預約</a>
+                                <ul class="dropdown-menu">
+                                    <li class="nav-item"><a class="nav-link" href="/searchhos">依醫院預約</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/appoint">依距離預約</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/body">依科別預約</a></li>
+                                </ul>
+                            </li> 
+                            <li class="nav-item"><a class="nav-link" href="/appointRecord">預約紀錄</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/transaction">交易紀錄</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/healthInfo">健康資訊</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/login">登出</a></li>
+                        </ul>
+                    </div> 
+                </nav>
+            </div>
+        </header>
+        <!--================Header Area =================-->
+        
+        <!--================Breadcrumb Area =================-->
+        
+        <section class="breadcrumb_area">
+            <div class="overlay bg-parallax" data-stellar-ratio="0.8" data-stellar-vertical-offset="0" data-background=""></div>
+            <div class="container">
+                <div class="page-cover text-center">
+                    <h2 class="page-cover-tittle"></h2>
+                </div>
+            </div>
+        </section>
+        <!--================Breadcrumb Area =================-->
+        {% block content %}
+            <div class="container">
+                {% for message in get_flashed_messages(with_categories=True) %}
+                <div class="alert alert-{{ message[0] }}">
+                    <button type="button" class="close-x" data-dismiss="alert">&times;</button>
+                    {{ message[1]}}
+                </div>
+                {% endfor %}
+            </div>
+        {% endblock content %}
+        <!--================ About History Area  =================-->
+        
+        <section class="about_history_area section_gap">
+            <div class="container">
+                <div class="row">
+                    <h2>點擊身體部位預約看診</h2>
+                    <br>
+                    <form id="depart-form" method="POST" action="{{url_for('reserveFromGraph')}}">
+                        <input id="hosDepart" type="hidden" name="depart" value="">
+                    </form>
+                    <img class="body-image" id="body" src="../static/images/body.png">
+                    <script>
+                        // 添加滑鼠釋放事件
+                        body.addEventListener('mouseup', function(options) {
+                        // 獲取滑鼠位置
+                        var x = options.offsetX;
+                        var y = options.offsetY;
+                        var dep = "";
+                        // 根據滑鼠位置顯示提示信息
+                        if(x < 262){
+                            // left
+                            if(y < 91){
+                                // brain
+                                dep = "Internal Medicine";
+                            }
+                            else if(y < 204){
+                                // heart
+                                dep = "Cardiology";
+                            }
+                            else if(y < 286){
+                                // kidney
+                                dep = "Nephrology";
+                            }
+                            else if(y < 383){
+                                // stomach
+                                dep = "Gastroenterology";
+                            }
+                            else if(y < 456){
+                                // liver
+                                dep = "Metabolism";
+                            }
+                            else{
+                                // bladder
+                                dep = "Urology";
+                            }
+                        }
+                        else{
+                            // right
+                            if(y < 91){
+                                // eyes
+                                dep = "Ophthalmology";
+                            }
+                            else if(y < 159){
+                                // thyroid
+                                dep = "Infection Control";
+                            }
+                            else if(y < 270){
+                                // lungs
+                                dep = "Chest Medecine";
+                            }
+                            else if(y < 360){
+                                // pancreas
+                                dep = "Internal Medicine";
+                            }
+                            else if(y < 450){
+                                // spleen
+                                dep = "Internal Medicine";
+                            }
+                            else{
+                                // intestine
+                                dep = "Gastroenterology";
+                            }
+                        }
+                        document.getElementById('hosDepart').value = dep;
+                        document.getElementById('depart-form').submit();
+                        });
+                    </script>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>

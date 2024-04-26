@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-table.css">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/Warn.css')}}">
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script> 
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+  <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+  
+  <title>MedEase</title>
+</head>
+
+<body>
+ 
+  <nav class="navbar navbar-inverse justify-content-center">
+    <div class="navbar-header">
+        <a class="navbar-brand " href="#">MedEase</a>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="/login"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+  	{% block content %}
+    <div class="container">
+        {% for message in get_flashed_messages(with_categories=True) %}
+        <div class="alert alert-{{ message[0] }}">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message[1]}}
+        </div>
+        {% endfor %}
+    </div>
+{% endblock content %}
+
+    <ul class="nav nav-tabs">
+      <li class="{% if defaultPage == 'home' %} active {% endif %}"><a href="#home" data-toggle="tab">Home</a></li>
+      <li class="{% if defaultPage == 'appoint' %} active {% endif %}"><a href="#appointment" data-toggle="tab">Appointment</a></li>
+      <li class="{% if defaultPage == 'trans' %} active {% endif %}"><a href="#transaction" data-toggle="tab">Transaction Record</a></li>
+      <li class="{% if defaultPage == 'info' %} active {% endif %}"><a href="#information" data-toggle="tab">Information</a></li>
+    </ul>
+    
+    
+    <div class="tab-content">
+      <!-- Home -->
+        <div id="home" class="tab-pane fade {% if defaultPage == 'home' %} active in {% endif %}">
+            <h3>Profile</h3>
+            <div class="row">
+            <div class="col-xs-12">
+                <p>Name : {{userInfo.name}}</p>
+                <p>ID Number : {{userInfo.IDnumber}}</p>
+                <p>Birthday : {{userInfo.birthday}}</p>   
+                <p>Phone Number : {{userInfo.phone}}</p>
+                <p>Wallet Balance : {{userInfo.wallet}}</p>
+                <!-- Modal -->
+                <button type="button " style="margin-left: 5px;" class=" btn btn-info " data-toggle="modal"
+                data-target="#wallet">Recharge</button>
+                <div class="modal fade" id="wallet"  data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog  modal-sm">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Recharge</h4>
+                            </div>
+                            <form class="form-group" role="form" method="POST" action="{{ url_for('addMoney') }}"> 
+                                <div class="modal-body">
+                                    <input type="text" class="form-control" id="value" name="value" placeholder="enter add value">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-default" >Add</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <br></br>
+            <h3>Emergency Contact</h3>
+            <div class="row">
+                <div class="col-xs-8">
+                <table id="shopTable" class="table" style=" margin-top: 15px;">
+                    <thead>
+                    <tr>
+                        <th scope="col" >#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Phone Number</th>
+                        <th scope="col">Relationship</th>
+                        <th scope="col">Delete</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for contact in contacts %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td>{{ contact.0 }}</td>
+                        <td>{{ contact.1 }}</td>
+                        <td>{{ contact.2 }}</td>
+                        <td>
+                          <form role="form" method="POST" action="{{ url_for('deleteContact') }}">
+                            <input type="hidden" name="eid" value="{{ contact.3 }}">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                          </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <!-- Modal -->
+                    <button type="button " style="margin-left: 5px;" class=" btn btn-info " data-toggle="modal"
+                    data-target="#add_e">Add Emergency Contact</button>
+                    <div class="modal fade" id="add_e"  data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog  modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Add Emergency Contact</h4>
+                                </div>
+                                <form class="form-group" role="form" method="POST" action="{{ url_for('addEcontact') }}"> 
+                                    <div class="modal-body">
+                                        <label class="control-label " for="e_name">Name</label>
+                                        <input type="text" class="form-control" id="e_name" name="e_name" placeholder="Enter Name" >
+                                        <br>
+                                        <label class="control-label " for="e_phone">Phone Number</label>
+                                        <input type="text" class="form-control" id="e_phone" name="e_phone" placeholder="Enter Phone Number" >
+                                        <br>
+                                        <label class="control-label " for="e_rela">Relationship</label>
+                                        <input type="text" class="form-control" id="e_rela" name="e_rela" placeholder="Enter Relationship" >
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-default" >Add</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Transaction Table -->
+        <div id="transaction" class="tab-pane fade {% if defaultPage == 'trans' %} active in {% endif %}">
+            <div class="row">
+                <div class="col-xs-8">
+                    <table id="transTable" class="table" style=" margin-top: 15px;">
+                    <thead>
+                        <tr>
+                        <th scope="col">Record ID</th>
+                        <th scope="col">Action</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in recordList %}
+                        <tr>
+                        <td>{{ record.0 }}</td>
+                        <td>{{ record.1 }}</td>
+                        <td>{{ record.2 }}</td>
+                        <td>{{ record.3 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- Appointment -->
+        <div id="appointment" class="tab-pane fade {% if defaultPage == 'appoint' %} active in {% endif %}">
+          <h3> Click any body part to make an appointment.</h3>
+          <br>
+          <form id="depart-form" method="POST" action="{{url_for('reserveFromGraph')}}">
+            <input id="hosDepart" type="hidden" name="depart" value="">
+          </form>
+          <img class="body-image" id="body" src="../static/images/body.png"></canvas>
+            <script>
+              
+                // 添加滑鼠釋放事件
+                body.addEventListener('mouseup', function(options) {
+
+                  // 獲取滑鼠位置
+                  var x = options.offsetX;
+                  var y = options.offsetY;
+                  var dep = "";
+                  // 根據滑鼠位置顯示提示信息
+                  if(x < 262){
+                      // left
+                      if(y < 91){
+                          // brain
+                          dep = "Internal Medicine";
+                      }
+                      else if(y < 204){
+                          // heart
+                          dep = "Cardiology";
+                      }
+                      else if(y < 286){
+                          // kidney
+                          dep = "Nephrology";
+                      }
+                      else if(y < 383){
+                          // stomach
+                          dep = "Gastroenterology";
+                      }
+                      else if(y < 456){
+                          // liver
+                          dep = "Metabolism";
+                      }
+                      else{
+                          // bladder
+                          dep = "Urology";
+                      }
+                  }
+                  else{
+                      // right
+                      if(y < 91){
+                          // eyes
+                          dep = "Ophthalmology";
+                      }
+                      else if(y < 159){
+                          // thyroid
+                          dep = "Infection Control";
+                      }
+                      else if(y < 270){
+                          // lungs
+                          dep = "Chest Medecine";
+                      }
+                      else if(y < 360){
+                          // pancreas
+                          dep = "Internal Medicine";
+                      }
+                      else if(y < 450){
+                          // spleen
+                          dep = "Internal Medicine";
+                      }
+                      else{
+                          // intestine
+                          dep = "Gastroenterology";
+                      }
+                  }
+                  document.getElementById('hosDepart').value = dep;
+                  document.getElementById('depart-form').submit();
+                });
+            </script>
+
+        <h3>Nearby Hospital</h3>
+        <br>
+        <form class="form-group" method="POST" action="{{url_for('searchHospital')}}"> 
+            <div class=" row  col-xs-8">
+                <div class="col-sm-5">
+                    <input type="text" class="form-control" name="keyword" placeholder="Enter Hospital Name">
+                </div>
+                <button type="submit" style="margin-left: 18px;"class="btn btn-primary">Search</button>
+            </div>
+        </form>
+        <br>
+        <div class="row">
+            <div class="  col-xs-8">
+              <form role="form" method="POST" action="getScheduleInfo">
+              <table id="shopTable" class="table" style=" margin-top: 15px;">
+                <thead>
+                  <tr>
+                    <th scope="col" >#</th>
+                    <th scope="col">Hospital</th>
+                    <th scope="col">Distance(km)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for hospital in hospitalList %}
+                  <tr>
+                    <th scope="row">{{ loop.index }}</th>
+                    <td>{{ hospital.0 }}</td>
+                    <td>{{ hospital.1/1000 }}</td>
+                    <td>
+                      <input type="hidden" value="{{ hospital.2 }}" id="{{ hospital.2 }}" name="hid" >
+                      <button type="button" id="ap{{ loop.index }}" class="btn btn-info" data-toggle="modal" data-target="#open">Appointment</button>
+                    </td>
+                    <script type="text/javascript">
+                      $('#ap{{ loop.index }}').click(function appointment() {
+                          var form = new FormData();
+                          form.append('hid', $("#{{ hospital.2 }}").val()); 
+                          $.ajax({
+                            type: "POST",
+                            url: $SCRIPT_ROOT + "/appointment",
+                            data: form,
+                            contentType: false,
+                            processData: false,
+                            dataType: "json",
+                            success: function(data) {  
+                              document.getElementById("aptbody").innerHTML = "";
+                              for (var i = 0; i < data.length; i++){
+                                var index = data[i].index;
+                                var department_name = data[i].d_name;
+                                var did = data[i].did;
+                                var tr_str = "<tr>"+"<th scope='row'>"+index+"</th>"+"<td>"+department_name+"</td>"+"<td><input type='hidden' name='id' id='form-id'>" + 
+                                "<button type='submit' name='did' value='"+did+"' onclick='setFormId(this)'class='btn btn-success'>Details</button></td></tr>";
+                                $("#aptbody").append(tr_str);
+                              }
+                              var num = "<input type='hidden' id='dataLength' value='"+data.length+"'></input>";
+                              $("#aptbody").append(num);
+                            }
+                          });
+                      })
+                    </script>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              <!-- Modal -->
+              <div class="modal fade" id="open"  data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Appointment by Medical Department</h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="row">
+                        <div class="  col-xs-12">
+                          
+                          <table class="table"style=" margin-top: 15px;">
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Medical Department</th>
+                            </tr>
+                          </thead>
+                          <tbody id="aptbody">
+                            
+                          </tbody>
+                          
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              </form>
+            </div>
+        </div>  
+        </div>
+        <!-- Information -->
+        <div id="information" class="tab-pane fade {% if defaultPage == 'info' %} active in {% endif %}">
+          <div class="row">
+              <div class="col-xs-8">
+                <br>
+                <audio controls>
+                  <source src="static/sound/info_sound.mp3" type="audio/mpeg">
+                  Not Support!!!
+                </audio>
+                <h3>運動後的飲食原則</h3>
+                <p>運動後怎麼吃才不發胖？資深營養師袁毓瑩表示，長時間且強度中高的有氧運動後30分鐘至60分鐘，是修補肌肉及提供身體營養補充的黄金期；正確飲食不僅不會影響減重，反而有助增強體力。運動後飲食建議首選水份飽滿、高鉀、高糖水果，如西瓜、鳳梨等，並注意勿食用高油、高鹽食物或利尿性飲品，以免造成身體負擔。</p>
+                <p>早期觀念認為運動後不宜進食，以免造成腸胃的負擔，甚至影響到疲勞的恢復，然而，這觀念已逐漸被修正。越來越多的研究結果發現，運動後的30分鐘至60分鐘，是修補肌肉及提供身體營養補充的黄金期，正確飲食不僅不會影響減重成效，更能提升個人體能。</p>
+                <p>然而，這裏談到「運動後的修補」是指運動時間至少1小時、強度達到中高的有氧運動程度，如慢跑10K、有氧舞蹈、游泳和自行車等運動項目。長時間運動會消耗身體的能量，讓身體流失水份、耗竭肝醣，因此，運動後進食是一件很自然的事情，也需要這麼做。</p>
+                <p>運動後除了補充水分外，飲食首選水份飽滿、高鉀、高糖的水果，如西瓜、鳳梨等，此外，切忌食用煎炸類、過多調味的加工食品等高油、高鹽食物，也應避免攝取利尿性的飲料，如咖啡、茶、可樂等，建議優先攝取新鮮自然的優質食物。</p>
+                <p>以下飲食為常見的餐飲店，建議運動後的1小時內（黄金時間）食用為佳：</p>
+                <p>1. 體能恢復飲食範例（針對長跑後，或運動1~3小時以上者）：飲食原則為碳水化合物佔60%（含水果、蔬菜、穀類）與蛋白質和脂肪佔40%（含肉魚豆蛋奶、植物油、堅果）</p>
+                <p>(1) 豆漿店：燒餅夾芽菜、蘿蔔糕一碟 + 蔥蛋、豆漿一杯</p>
+                <p>(2) 水餃店：酸辣湯一碗、青菜二碟、水果一顆 + 蒸餃十顆</p>
+                <p>(3) 速食店：海鮮米漢堡及鱈魚堡（內含鱈魚塊、歐姆蛋）、生菜沙拉、柳橙汁 </p>
+                <p>(4)日式餐：綜合壽司十個、牛蒡炒肉絲、和風生菜沙拉 + 茶碗蒸、烤鮭魚、肉絲</p>
+                <p>(5) 歐式餐：生菜水果沙拉、全麥土司二片抹奶油及果醬、綜合果汁 + 淋冷壓初榨橄欖油、佐起司粉或起司塊、白煮蛋一顆</p>
+                <p>2. 增加瘦肌肉群，減少體脂飲食（針對重量訓練，或高強度短時間的訓練後）：飲食原則為碳水化合物佔40%（含水果、蔬菜、穀類）與蛋白質和脂肪佔60%（含肉魚豆蛋奶、植物油、堅果）</p>
+                <p>(1) 水餃店：青菜豆腐湯一碗、青菜一碟 + 水餃十顆、滷蛋一個</p>
+                <p>(2) 日式餐：和風生菜沙拉、蕎麥涼麵 + 生魚片、牛肉、茶碗蒸、味增豆腐湯</p>
+                <p>(3) 歐式餐：生菜水果沙拉、羅宋湯 + 淋冷壓初榨橄欖油、佐起司粉或白煮蛋一顆、豬或魚排一份</p>
+                <p>值得注意的是，沒有任何一種食物或運動後的食譜適合每一個人，建議依實際需求，找出最適合自己在運動後吃了體力恢復良好又舒服的食物。</p>
+              </div>
+          </div>
+        </div>
+
+    </div>
+
+  <script>
+    $(document).ready(function () {
+      $(".nav-tabs a").click(function () {
+        $(this).tab('show');
+      });
+    });
+  </script>
+  <script type=text/javascript>
+	$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+  </script>
+</body>
+</html>

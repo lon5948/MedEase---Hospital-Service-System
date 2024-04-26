@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Fabric.js Demo</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.4.0/fabric.min.js"></script>
+  <link rel="stylesheet" href="../static/css/Warn.css">
+  <style>
+    body {
+      overflow: hidden; /* 禁用網頁滾動 */
+    }
+  </style>
+
+</head>
+<body>
+  <img class="body-image" id="body" src="../static/images/body.png"></canvas>
+  <div id="coords"></div>
+  <script>
+    
+      // 添加滑鼠釋放事件
+      body.addEventListener('mouseup', function(options) {
+
+        // 獲取滑鼠位置
+        var x = options.offsetX;
+        var y = options.offsetY;
+
+        var coords = document.getElementById('coords');
+        coords.innerHTML = 'X: ' + x + ', Y: ' + y;
+
+        // 根據滑鼠位置顯示提示信息
+        if(x < 262){
+            // left
+            if(y < 91){
+                // brain
+                alert('brain');
+            }
+            else if(y < 204){
+                // heart
+                alert('heart');
+            }
+            else if(y < 286){
+                // kidney
+                alert('kidney');
+            }
+            else if(y < 383){
+                // stomach
+                alert('stomach');
+            }
+            else if(y < 456){
+                // liver
+                alert('liver');
+            }
+            else{
+                // bladder
+                alert('bladder');
+            }
+        }
+        else{
+            // right
+            if(y < 91){
+                // eyes
+                alert('eyes');
+            }
+            else if(y < 159){
+                // thyroid
+                alert('thyroid');
+            }
+            else if(y < 270){
+                // lungs
+                alert('lungs');
+            }
+            else if(y < 360){
+                // pancreas
+                alert('pancreas');
+            }
+            else if(y < 450){
+                // spleen
+                alert('spleen');
+            }
+            else{
+                // intestine
+                alert('intestine');
+            }
+        }
+      });
+  </script>
+</body>
+</html>

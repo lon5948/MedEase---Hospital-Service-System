@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="../static/images/favicon.png" type="image/png">
+        <title>MedEase</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../static/css/bootstrap.css">
+        <link rel="stylesheet" href="../static/vendors/linericon/style.css">
+        <link rel="stylesheet" href="../static/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../static/css/style2.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script> 
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+
+        <!-- Bootstrap CSS -->
+        
+    </head>
+    <body>
+        <!--================Header Area =================-->
+        <header class="header_area">
+            <div class="container">
+                <nav class="navbar navbar-expand-lg navbar-light">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <h1><a class="navbar-brand" href="/main">MedEase</a></h1>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
+                        <ul class="nav navbar-nav menu_nav ml-auto">
+                            <li class="nav-item active"><a class="nav-link" href="/main">首頁</a></li> 
+                            <li class="nav-item submenu dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">個人檔案</a>
+                                <ul class="dropdown-menu">
+                                    <li class="nav-item"><a class="nav-link" href="/profile">基本資料</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/Econtact">緊急聯絡人</a></li>
+                                </ul>
+                            </li> 
+                            <li class="nav-item submenu dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">預約</a>
+                                <ul class="dropdown-menu">
+                                    <li class="nav-item"><a class="nav-link" href="/searchhos">依醫院預約</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/appoint">依距離預約</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/body">依科別預約</a></li>
+                                </ul>
+                            </li> 
+                            <li class="nav-item"><a class="nav-link" href="/appointRecord">預約紀錄</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/transaction">交易紀錄</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/healthInfo">健康資訊</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/login">登出</a></li>
+                        </ul>
+                    </div> 
+                </nav>
+            </div>
+        </header>
+        <!--================Header Area =================-->
+        
+        <!--================Breadcrumb Area =================-->
+        
+        <section class="breadcrumb_area">
+            <div class="overlay bg-parallax" data-stellar-ratio="0.8" data-stellar-vertical-offset="0" data-background=""></div>
+            <div class="container">
+                <div class="page-cover text-center">
+                    <h2 class="page-cover-tittle">搜尋醫院</h2>
+                </div>
+            </div>
+        </section>
+        <!--================Breadcrumb Area =================-->
+        {% block content %}
+            <div class="container">
+                {% for message in get_flashed_messages(with_categories=True) %}
+                <div class="alert alert-{{ message[0] }}">
+                    <button type="button" class="close-x" data-dismiss="alert">&times;</button>
+                    {{ message[1]}}
+                </div>
+                {% endfor %}
+            </div>
+        {% endblock content %}
+        <!--================ About History Area  =================-->
+        
+        <section class="about_history_area section_gap">
+            <div class="container">
+                <div class="row">
+                    <form class="form-group" method="POST" action="{{url_for('searchHospital')}}"> 
+                        <input type="text" class="form-control" name="keyword" placeholder="請輸入關鍵字">
+                        <button type="submit" style="margin-top: 20px;"class="btn btn-primary">搜尋</button>
+                    </form>
+                    <form class="table" role="form" method="POST" action="getScheduleInfo">
+                        <table id="aTable" class="table" style=" margin-top: 30px;">
+                        <thead>
+                            <tr>
+                            <th scope="col" >#</th>
+                            <th scope="col">醫院名稱</th>
+                            <th scope="col">距離(公里)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hospital in hospitalList %}
+                            <tr>
+                            <th scope="row">{{ loop.index }}</th>
+                            <td>{{ hospital.0 }}</td>
+                            <td>{{ hospital.1/1000 }}</td>
+                            <td>
+                                <input type="hidden" value="{{ hospital.2 }}" id="{{ hospital.2 }}" name="hid" >
+                                <button type="button" id="ap{{ loop.index }}" class="btn btn-info" data-toggle="modal" data-target="#open">查看科別</button>
+                            </td>
+                            <script type="text/javascript">
+                                $('#ap{{ loop.index }}').click(function appointment() {
+                                    var form = new FormData();
+                                    form.append('hid', $("#{{ hospital.2 }}").val()); 
+                                    $.ajax({
+                                    type: "POST",
+                                    url: $SCRIPT_ROOT + "/appointment",
+                                    data: form,
+                                    contentType: false,
+                                    processData: false,
+                                    dataType: "json",
+                                    success: function(data) {  
+                                        document.getElementById("aptbody").innerHTML = "";
+                                        for (var i = 0; i < data.length; i++){
+                                        var index = data[i].index;
+                                        var department_name = data[i].d_name;
+                                        var did = data[i].did;
+                                        var tr_str = "<tr>"+"<th scope='row'>"+index+"</th>"+"<td>"+department_name+"</td>"+"<td><input type='hidden' name='id' id='form-id'>" + 
+                                        "<button type='submit' name='did' value='"+did+"' onclick='setFormId(this)'class='btn btn-success'>Details</button></td></tr>";
+                                        $("#aptbody").append(tr_str);
+                                        }
+                                        var num = "<input type='hidden' id='dataLength' value='"+data.length+"'></input>";
+                                        $("#aptbody").append(num);
+                                    }
+                                    });
+                                })
+                            </script>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        </table>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="open"  data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="  col-xs-12">
+                                                <table class="table"style=" margin-top: 15px;">
+                                                    <thead>
+                                                        <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">科別</th>
+                                                        <th scope="col">預約</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="aptbody">
+                                                        <tr>
+                                                            <th scope="row">1</th>
+                                                            <td>腎臟科</td>
+                                                            <td>
+                                                                <button type="button" id="a" class="btn btn-info" data-toggle="modal" data-target="#open">馬上預約</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">2</th>
+                                                            <td>心臟科</td>
+                                                            <td>
+                                                                <button type="button" id="a" class="btn btn-info" data-toggle="modal" data-target="#open">馬上預約</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">3</th>
+                                                            <td>小兒科</td>
+                                                            <td>
+                                                                <button type="button" id="a" class="btn btn-info" data-toggle="modal" data-target="#open">馬上預約</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">4</th>
+                                                            <td>眼科</td>
+                                                            <td>
+                                                                <button type="button" id="a" class="btn btn-info" data-toggle="modal" data-target="#open">馬上預約</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">5</th>
+                                                            <td>牙科</td>
+                                                            <td>
+                                                                <button type="button" id="a" class="btn btn-info" data-toggle="modal" data-target="#open">馬上預約</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">7</th>
+                                                            <td>外科</td>
+                                                            <td>
+                                                                <button type="button" id="a" class="btn btn-info" data-toggle="modal" data-target="#open">馬上預約</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">8</th>
+                                                            <td>內科</td>
+                                                            <td>
+                                                                <button type="button" id="a" class="btn btn-info" data-toggle="modal" data-target="#open">馬上預約</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">9</th>
+                                                            <td>骨科</td>
+                                                            <td>
+                                                                <button type="button" id="a" class="btn btn-info" data-toggle="modal" data-target="#open">馬上預約</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">10</th>
+                                                            <td>泌尿科</td>
+                                                            <td>
+                                                                <button type="button" id="a" class="btn btn-info" data-toggle="modal" data-target="#open">馬上預約</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal -->
+                    </form>
+                </div>
+            </div>
+        </section>
+
+
+    </body>
+</html>
